@@ -1,4 +1,5 @@
 from dateutil.parser import parse
+import numpy as np
 
 
 def split_by_month(data):
@@ -24,3 +25,6 @@ def get_remain_pay(column, month):
     if month - column["month"] <= column["plannum"] and month - column["month"] > 0:
         return column["pay_per_month"]
     return 0
+
+def change_loan(loan):
+    return np.round(5**(loan)-1, 2)
