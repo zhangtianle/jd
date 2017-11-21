@@ -17,8 +17,8 @@ order['discount'] = change_loan(order['discount'])
 
 uid = pd.DataFrame(user["uid"])
 
-MONTH = 10
-NUM = 3.0
+MONTH = 11
+NUM = 4.0
 
 feature_loan = get_loan_feature(MONTH, NUM, uid, loan)
 user_m = get_user_feature(MONTH, user, feature_url, save=0)
@@ -33,13 +33,5 @@ feature = pd.merge(feature, feature_click, on=["uid"], how="left")
 feature = handle_na(feature)
 
 # 保存特征数据
-feature.to_csv(feature_url + "train_x_offline.csv", index=False)
+feature.to_csv(feature_url + "test_x_online.csv", index=False)
 
-# 获得预测值
-loan_next_month = pd.DataFrame(pd.read_csv(root_dir + "t_loan_sum.csv"))
-loan_next_month.pop("month")
-
-loan_next_month = pd.merge(uid, loan_next_month, on=["uid"], how="left")
-loan_next_month["loan_sum"] = loan_next_month["loan_sum"].fillna(0.0)
-# 保存预测数据
-loan_next_month.to_csv(feature_url + "train_y_offline.csv", index=False)
