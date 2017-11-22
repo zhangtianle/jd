@@ -5,12 +5,36 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import xgboost as xgb
 
 from tl.src.util import read_data
 
 
 def delete(x, test, coloumn):
     return x.pop(coloumn), test.pop(coloumn)
+
+def xgb_train(X, Y):
+    train_X = X.as_matrix()
+    train_Y = Y.as_matrix()
+
+    X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
+
+    dtrain = xgb.DMatrix(X_train, label=y_train)
+    dtest = xgb.DMatrix(X_test, label=y_test)
+    evallist = [(dtest, 'eval'), (dtrain, 'train')]
+
+    param = {'max_depth': 2, 'eta': 1, 'silent': 1, 'objective': 'binary:logistic'}
+    # alternatively:
+    plst = param.items()
+    plst += [('eval_metric', 'ams@0')]
+
+    num_round = 10
+    bst = xgb.train(plst, dtrain, num_round, evallist)
+    # make prediction
+    preds = bst.predict(dtest)
+
+    xgb.plot_importance(bst)
+    xgb.plot_tree(bst, num_trees=2)
 
 
 def offline(X, Y):
