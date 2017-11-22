@@ -13,6 +13,7 @@ from tl.src.util import read_data
 def delete(x, test, coloumn):
     return x.pop(coloumn), test.pop(coloumn)
 
+
 def xgb_train(X, Y):
     train_X = X.as_matrix()
     train_Y = Y.as_matrix()
@@ -23,18 +24,49 @@ def xgb_train(X, Y):
     dtest = xgb.DMatrix(X_test, label=y_test)
     evallist = [(dtest, 'eval'), (dtrain, 'train')]
 
-    param = {'max_depth': 2, 'eta': 1, 'silent': 1, 'objective': 'binary:logistic'}
+    param = {'max_depth': 8, 'eta': 0.1, 'silent': 1, 'eval_metric': 'rmse'}
     # alternatively:
     plst = param.items()
-    plst += [('eval_metric', 'ams@0')]
+    # plst += [('eval_metric', 'ams@0')]
 
-    num_round = 10
+    num_round = 40
     bst = xgb.train(plst, dtrain, num_round, evallist)
     # make prediction
     preds = bst.predict(dtest)
 
     xgb.plot_importance(bst)
     xgb.plot_tree(bst, num_trees=2)
+
+def xgb_train_online(X, Y, Test, uid):
+    train_X = X.as_matrix()
+    train_Y = Y.as_matrix()
+
+    test_X = Test.as_matrix()
+
+    dtrain = xgb.DMatrix(train_X, label=train_Y)
+    dtest = xgb.DMatrix(test_X)
+    evallist = [(dtrain, 'train')]
+
+    param = {'max_depth': 8, 'eta': 0.1, 'silent': 1, 'eval_metric': 'rmse'}
+    # alternatively:
+    plst = param.items()
+    # plst += [('eval_metric', 'ams@0')]
+
+    num_round = 40
+    bst = xgb.train(plst, dtrain, num_round, evallist)
+    # make prediction
+    predict = bst.predict(dtest)
+
+    xgb.plot_importance(bst)
+    xgb.plot_tree(bst, num_trees=2)
+
+    for _ in range(len(predict)):
+        if predict[_] < 0:
+            predict[_] = 0.0
+    result = pd.DataFrame()
+    result[0] = uid
+    result[1] = predict
+    result.to_csv("../result/result_11.22_xbg.csv", header=None, index=False, encoding="utf-8")
 
 
 def offline(X, Y):
@@ -145,7 +177,9 @@ def main():
 
     Y.pop("uid")
 
-    offline(X, Y)
+    # offline(X, Y)
+    # xgb_train(X, Y)
+    xgb_train_online(X, Y, Test, uid)
     # online_GBDT(X, Y, Test, uid)
     # online_LR(X, Y, Test, uid)
 
