@@ -5,7 +5,6 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-
 from tl.src.util import read_data
 
 
@@ -17,24 +16,27 @@ def offline(X, Y):
     train_X = X.as_matrix()
     train_Y = Y.as_matrix()
 
+    train_X = data_scaler(train_X)
+
     X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
 
     clf = GradientBoostingRegressor(loss='ls', alpha=0.9,
                                     n_estimators=500,
-                                    learning_rate=0.02,
-                                    max_depth=8,
-                                    subsample=0.8, min_samples_leaf=9,
-                                    min_samples_split=9)
+                                    learning_rate=0.05,
+                                    max_depth=10,
+                                    subsample=0.8,
+                                    min_samples_split=9,
+                                    max_leaf_nodes=10)
     clf = clf.fit(X_train, y_train)
     predict = clf.predict(X_train)
-    print(clf.score(X_test, y_test))
+    print(clf.score(X_train, y_train))
     for _ in range(len(predict)):
         if predict[_] < 0:
             predict[_] = 0.0
     print("GBDT: Mean squared train error: %.2f" % mean_squared_error(y_train, predict))
 
     predict = clf.predict(X_test)
-    print(clf.score(X_test, y_train))
+    print(clf.score(X_test, y_test))
     for _ in range(len(predict)):
         if predict[_] < 0:
             predict[_] = 0.0
@@ -47,12 +49,20 @@ def offline(X, Y):
     plt.show()
 
     clf = LinearRegression()
-    clf.fit(train_X, train_Y)
-    predict = clf.predict(train_X)
+    clf.fit(X_train, y_train)
+    predict = clf.predict(X_train)
+    print(clf.score(X_test, y_test))
     for _ in range(len(predict)):
         if predict[_] < 0:
             predict[_] = 0.0
-    print("Linear Regression: Mean squared error: %.2f" % mean_squared_error(train_Y, predict))
+    print("Linear Regression: Mean squared train error: %.2f" % mean_squared_error(y_train, predict))
+
+    predict = clf.predict(X_test)
+    print(clf.score(X_test, y_test))
+    for _ in range(len(predict)):
+        if predict[_] < 0:
+            predict[_] = 0.0
+    print("Linear Regression: Mean squared test error: %.2f" % mean_squared_error(y_test, predict))
 
 
 def online_LR(X, Y, Test, uid):
