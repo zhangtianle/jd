@@ -7,7 +7,8 @@ import pandas as pd
 
 
 def split_by_month(data):
-    return parse(data).month
+    return int(data.split('-')[1])
+    # return parse(data).month
 
 def split_by_month_further(data, month):
     return parse(data).month > month
@@ -45,16 +46,7 @@ def change_loan(loan):
 
 
 def handle_na(feature):
-    feature["current_pay_sum"] = feature["current_pay_sum"].fillna(0.0)
-    feature["current_loan_sum"] = feature["current_loan_sum"].fillna(0.0)
-    feature["current_price_sum"] = feature["current_price_sum"].fillna(0.0)
-    feature["average_price"] = feature["average_price"].fillna(0.0)
-    feature["average_loan"] = feature["average_loan"].fillna(0.0)
-    feature["average_pay"] = feature["average_pay"].fillna(0.0)
-    feature["remain_loan"] = feature["remain_loan"].fillna(0.0)
-    feature["remain_pay"] = feature["remain_pay"].fillna(0.0)
-    feature["average_discount"] = feature["average_discount"].fillna(0.0)
-    return feature
+    return feature.fillna(0.0)
 
 
 def get_url():

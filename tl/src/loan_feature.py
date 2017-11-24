@@ -24,15 +24,15 @@ def get_loan_feature(MONTH, NUM, uid, loan):
     average_pay = pd.DataFrame({"average_pay": loan.loc[loan["month"] <= MONTH]["pay_per_month"].groupby([loan["uid"]]).sum()}).reset_index()
     average_pay["average_pay"] = average_pay["average_pay"].apply(lambda x: log(x / NUM + 1, 5))
 
-    min_max_pay = pd.DataFrame(loan.loc[loan["month"] <= MONTH]["pay_per_month"].groupby([loan["uid"], loan["month"]]).sum()).reset_index()
+    # min_max_pay = pd.DataFrame(loan.loc[loan["month"] <= MONTH]["pay_per_month"].groupby([loan["uid"], loan["month"]]).sum()).reset_index()
 
-    min_loan_pay = pd.DataFrame(min_max_pay["pay_per_month"].groupby([loan["uid"]]).min()).reset_index()
-    min_loan_pay = min_loan_pay.rename(columns={"pay_per_month": "min_loan_pay"})
-    min_loan_pay["min_loan_pay"] = min_loan_pay["min_loan_pay"].apply(lambda x: log(x + 1, 5))
+    # min_loan_pay = pd.DataFrame(min_max_pay["pay_per_month"].groupby([loan["uid"]]).min()).reset_index()
+    # min_loan_pay = min_loan_pay.rename(columns={"pay_per_month": "min_loan_pay"})
+    # min_loan_pay["min_loan_pay"] = min_loan_pay["min_loan_pay"].apply(lambda x: log(x + 1, 5))
 
-    max_loan_pay = pd.DataFrame(min_max_pay["pay_per_month"].groupby([loan["uid"]]).max()).reset_index()
-    max_loan_pay = max_loan_pay.rename(columns={"pay_per_month": "max_loan_pay"})
-    max_loan_pay["max_loan_pay"] = max_loan_pay["max_loan_pay"].apply(lambda x: log(x + 1, 5))
+    # max_loan_pay = pd.DataFrame(min_max_pay["pay_per_month"].groupby([loan["uid"]]).max()).reset_index()
+    # max_loan_pay = max_loan_pay.rename(columns={"pay_per_month": "max_loan_pay"})
+    # max_loan_pay["max_loan_pay"] = max_loan_pay["max_loan_pay"].apply(lambda x: log(x + 1, 5))
 
     # 历史贷款总额
     remain_loan = pd.DataFrame(loan.loc[loan["month"] <= MONTH]["remain_loan"].groupby([loan["uid"]]).sum()).reset_index()
@@ -52,37 +52,37 @@ def get_loan_feature(MONTH, NUM, uid, loan):
     average_pay_each = loan.loc[loan["month"] <= MONTH].groupby(["uid"]).agg({"pay_per_month": "mean"}).rename(
         columns={"pay_per_month": "average_pay_each"}).reset_index()
     average_pay_each["average_pay_each"] = average_pay_each["average_pay_each"].apply(lambda x: log(x + 1, 5))
-    min_pay_each = pd.DataFrame(
-        {"min_pay_each": loan.loc[loan["month"] <= MONTH]["pay_per_month"].groupby([loan["uid"]]).min()}).reset_index()
-    min_pay_each["min_pay_each"] = min_pay_each["min_pay_each"].apply(lambda x: log(x + 1, 5))
-    max_pay_each = pd.DataFrame(
-        {"max_pay_each": loan.loc[loan["month"] <= MONTH]["pay_per_month"].groupby([loan["uid"]]).max()}).reset_index()
-    max_pay_each["max_pay_each"] = max_pay_each["max_pay_each"].apply(lambda x: log(x + 1, 5))
+    # min_pay_each = pd.DataFrame(
+    #     {"min_pay_each": loan.loc[loan["month"] <= MONTH]["pay_per_month"].groupby([loan["uid"]]).min()}).reset_index()
+    # min_pay_each["min_pay_each"] = min_pay_each["min_pay_each"].apply(lambda x: log(x + 1, 5))
+    # max_pay_each = pd.DataFrame(
+    #     {"max_pay_each": loan.loc[loan["month"] <= MONTH]["pay_per_month"].groupby([loan["uid"]]).max()}).reset_index()
+    # max_pay_each["max_pay_each"] = max_pay_each["max_pay_each"].apply(lambda x: log(x + 1, 5))
 
     # 平均/最高/最低每一贷款
     average_loan_each = loan.loc[loan["month"] <= MONTH].groupby(["uid"]).agg({"loan_amount": "mean"}).rename(
         columns={"loan_amount": "average_loan_each"}).reset_index()
     average_loan_each["average_loan_each"] = average_loan_each["average_loan_each"].apply(lambda x: log(x + 1, 5))
-    min_loan_each = pd.DataFrame(
-        {"min_loan_each": loan.loc[loan["month"] <= MONTH]["loan_amount"].groupby([loan["uid"]]).min()}).reset_index()
-    min_loan_each["min_loan_each"] = min_loan_each["min_loan_each"].apply(lambda x: log(x + 1, 5))
-    max_loan_each = pd.DataFrame(
-        {"max_loan_each": loan.loc[loan["month"] <= MONTH]["loan_amount"].groupby([loan["uid"]]).max()}).reset_index()
-    max_loan_each["max_loan_each"] = max_loan_each["max_loan_each"].apply(lambda x: log(x + 1, 5))
+    # min_loan_each = pd.DataFrame(
+    #     {"min_loan_each": loan.loc[loan["month"] <= MONTH]["loan_amount"].groupby([loan["uid"]]).min()}).reset_index()
+    # min_loan_each["min_loan_each"] = min_loan_each["min_loan_each"].apply(lambda x: log(x + 1, 5))
+    # max_loan_each = pd.DataFrame(
+    #     {"max_loan_each": loan.loc[loan["month"] <= MONTH]["loan_amount"].groupby([loan["uid"]]).max()}).reset_index()
+    # max_loan_each["max_loan_each"] = max_loan_each["max_loan_each"].apply(lambda x: log(x + 1, 5))
 
     feature_loan = pd.merge(uid, average_loan, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, average_pay, on=["uid"], how="left")
-    feature_loan = pd.merge(feature_loan, min_loan_pay, on=["uid"], how="left")
-    feature_loan = pd.merge(feature_loan, max_loan_pay, on=["uid"], how="left")
+    # feature_loan = pd.merge(feature_loan, min_loan_pay, on=["uid"], how="left")
+    # feature_loan = pd.merge(feature_loan, max_loan_pay, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, remain_loan, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, remain_pay, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, current_pay_sum, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, current_loan_sum, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, average_pay_each, on=["uid"], how="left")
-    feature_loan = pd.merge(feature_loan, min_pay_each, on=["uid"], how="left")
-    feature_loan = pd.merge(feature_loan, max_pay_each, on=["uid"], how="left")
+    # feature_loan = pd.merge(feature_loan, min_pay_each, on=["uid"], how="left")
+    # feature_loan = pd.merge(feature_loan, max_pay_each, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, average_loan_each, on=["uid"], how="left")
-    feature_loan = pd.merge(feature_loan, min_loan_each, on=["uid"], how="left")
-    feature_loan = pd.merge(feature_loan, max_loan_each, on=["uid"], how="left")
+    # feature_loan = pd.merge(feature_loan, min_loan_each, on=["uid"], how="left")
+    # feature_loan = pd.merge(feature_loan, max_loan_each, on=["uid"], how="left")
 
     return feature_loan

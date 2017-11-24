@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import xgboost as xgb
 
+from tl.src.MyModel import MyModel
 from tl.src.util import read_data
 
 
@@ -14,9 +15,67 @@ def delete(x, test, coloumn):
     return x.pop(coloumn), test.pop(coloumn)
 
 
+def error(y_train, predict):
+    for _ in range(len(predict)):
+        if predict[_] < 0:
+            predict[_] = 0.0
+    print("Mean squared train error: %.2f" % mean_squared_error(y_train, predict) ** 0.5)
+
+
+def xgb_classify(X, Y):
+    train_X = X.as_matrix()
+    train_Y = Y.as_matrix()
+
+    for i in range(len(train_Y)):
+        if train_Y[i] != 0:
+            train_Y[i] = 1
+        else:
+            train_Y[i] = 0
+
+    train_X = data_scaler(train_X)
+
+    X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
+    dtrain = xgb.DMatrix(X_train, label=y_train)
+    dtest = xgb.DMatrix(X_test, label=y_test)
+    evallist = [(dtest, 'eval'), (dtrain, 'train')]
+
+    model = MyModel()
+    bst = xgb.train(model.xgb_c_param, dtrain, model.xgb_c_num_round, evallist)
+    return bst.predict(dtest)
+
+
+def xgb_classify_online(X, Y, Test, uid):
+    train_X = X.as_matrix()
+    train_Y = Y.as_matrix()
+    test_X = Test.as_matrix()
+
+    for i in range(len(train_Y)):
+        if train_Y[i] != 0:
+            train_Y[i] = 1
+        else:
+            train_Y[i] = 0
+
+    train_X = data_scaler(train_X)
+
+    dtrain = xgb.DMatrix(train_X, label=train_Y)
+    dtest = xgb.DMatrix(test_X)
+    evallist = [(dtrain, 'train')]
+
+    dtrain = xgb.DMatrix(train_X, label=train_Y)
+
+    model = MyModel()
+
+    bst = xgb.train(model.xgb_c_param, dtrain, model.xgb_c_num_round, evallist)
+    # make prediction
+    predict = bst.predict(dtest)
+    return predict
+
+
 def xgb_train(X, Y):
     train_X = X.as_matrix()
     train_Y = Y.as_matrix()
+
+    train_X = data_scaler(train_X)
 
     X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
 
@@ -24,18 +83,25 @@ def xgb_train(X, Y):
     dtest = xgb.DMatrix(X_test, label=y_test)
     evallist = [(dtest, 'eval'), (dtrain, 'train')]
 
-    param = {'max_depth': 8, 'eta': 0.1, 'silent': 1, 'eval_metric': 'rmse'}
-    # alternatively:
-    plst = param.items()
-    # plst += [('eval_metric', 'ams@0')]
+    model = MyModel()
 
-    num_round = 40
-    bst = xgb.train(plst, dtrain, num_round, evallist)
+    # num_round = 150
+    bst = xgb.train(model.xgb_r_param, dtrain, model.xgb_r_num_round, evallist)
     # make prediction
     preds = bst.predict(dtest)
-
     xgb.plot_importance(bst)
-    xgb.plot_tree(bst, num_trees=2)
+    # xgb.plot_importance(bst)
+    # xgb.plot_tree(bst, num_trees=2)
+
+    # 加上分类的结果
+    # classify = xgb_classify(X, Y)
+    # for i in range(len(preds)):
+    #     if classify[i] == 0:
+    #         preds[i] = 0
+    # error(y_test, preds)
+
+    return preds
+
 
 def xgb_train_online(X, Y, Test, uid):
     train_X = X.as_matrix()
@@ -47,13 +113,9 @@ def xgb_train_online(X, Y, Test, uid):
     dtest = xgb.DMatrix(test_X)
     evallist = [(dtrain, 'train')]
 
-    param = {'max_depth': 8, 'eta': 0.1, 'silent': 1, 'eval_metric': 'rmse'}
-    # alternatively:
-    plst = param.items()
-    # plst += [('eval_metric', 'ams@0')]
+    model = MyModel()
 
-    num_round = 40
-    bst = xgb.train(plst, dtrain, num_round, evallist)
+    bst = xgb.train(model.xgb_r_param, dtrain, model.xgb_r_num_round, evallist)
     # make prediction
     predict = bst.predict(dtest)
 
@@ -66,7 +128,7 @@ def xgb_train_online(X, Y, Test, uid):
     result = pd.DataFrame()
     result[0] = uid
     result[1] = predict
-    result.to_csv("../result/result_11.22_xbg.csv", header=None, index=False, encoding="utf-8")
+    result.to_csv("../result/result_11.24_1_xbg.csv", header=None, index=False, encoding="utf-8")
 
 
 def offline(X, Y):
@@ -87,17 +149,11 @@ def offline(X, Y):
     clf = clf.fit(X_train, y_train)
     predict = clf.predict(X_train)
     print(clf.score(X_train, y_train))
-    for _ in range(len(predict)):
-        if predict[_] < 0:
-            predict[_] = 0.0
-    print("GBDT: Mean squared train error: %.2f" % mean_squared_error(y_train, predict))
+    error(y_train, predict)
 
     predict = clf.predict(X_test)
     print(clf.score(X_test, y_test))
-    for _ in range(len(predict)):
-        if predict[_] < 0:
-            predict[_] = 0.0
-    print("GBDT: Mean squared test error: %.2f" % mean_squared_error(y_test, predict))
+    error(y_test, predict)
 
     predictors = [x for x in X.columns]
     feat_imp = pd.Series(clf.feature_importances_, predictors).sort_values(ascending=False)
@@ -188,9 +244,14 @@ def main():
 
     Y.pop("uid")
 
+    # xgb参数
+    model = MyModel()
+
+    # classify = xgb_classify(X, Y)
+
     # offline(X, Y)
-    # xgb_train(X, Y)
-    xgb_train_online(X, Y, Test, uid)
+    preds = xgb_train(X, Y)
+    # xgb_train_online(X, Y, Test, uid)
     # online_GBDT(X, Y, Test, uid)
     # online_LR(X, Y, Test, uid)
 

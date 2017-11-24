@@ -23,7 +23,8 @@ NUM = 3.0
 feature_loan = get_loan_feature(MONTH, NUM, uid, loan)
 user_m = get_user_feature(MONTH, user, feature_url, save=0)
 feature = get_order_feature(MONTH, NUM, order, uid)
-feature_click = get_click_feature(MONTH, click)
+# feature_click = get_click_feature(MONTH, click)
+feature_click = pd.DataFrame(pd.read_csv('/home/kyle/project/jd/tl/feature/click_feature_10.csv'))
 
 feature = pd.merge(feature, feature_loan, on=["uid"], how="left")
 feature = pd.merge(feature, user_m, on=["uid"], how="left")
