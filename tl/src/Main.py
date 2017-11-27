@@ -77,7 +77,7 @@ def xgb_train(X, Y):
 
     train_X = data_scaler(train_X)
 
-    X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
+    X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=8)
 
     dtrain = xgb.DMatrix(X_train, label=y_train)
     dtest = xgb.DMatrix(X_test, label=y_test)
@@ -87,11 +87,13 @@ def xgb_train(X, Y):
 
     # num_round = 150
     bst = xgb.train(model.xgb_r_param, dtrain, model.xgb_r_num_round, evallist)
+    # bst = xgb.cv(model.xgb_r_param, dtrain, model.xgb_r_num_round, nfold=5, metrics={'error'}, seed=0, callbacks=[xgb.callback.print_evaluation(show_stdv=True)])
+
     # make prediction
     preds = bst.predict(dtest)
     xgb.plot_importance(bst)
-    # xgb.plot_importance(bst)
     # xgb.plot_tree(bst, num_trees=2)
+    plt.show()
 
     # 加上分类的结果
     # classify = xgb_classify(X, Y)
@@ -119,8 +121,8 @@ def xgb_train_online(X, Y, Test, uid):
     # make prediction
     predict = bst.predict(dtest)
 
-    xgb.plot_importance(bst)
-    xgb.plot_tree(bst, num_trees=2)
+    # xgb.plot_importance(bst)
+    # xgb.plot_tree(bst, num_trees=2)
 
     for _ in range(len(predict)):
         if predict[_] < 0:
@@ -128,7 +130,7 @@ def xgb_train_online(X, Y, Test, uid):
     result = pd.DataFrame()
     result[0] = uid
     result[1] = predict
-    result.to_csv("../result/result_11.24_1_xbg.csv", header=None, index=False, encoding="utf-8")
+    result.to_csv("../result/result_11.27_1_xbg.csv", header=None, index=False, encoding="utf-8")
 
 
 def offline(X, Y):
@@ -228,8 +230,8 @@ def data_scaler(data):
 
 
 def main():
-    loan, user, order, click = read_data()
-    uid = pd.DataFrame(user["uid"])
+    # loan, user, order, click = read_data()
+    # uid = pd.DataFrame(user["uid"])
 
     X = pd.DataFrame(pd.read_csv("../feature/train_x_offline.csv"))
     Y = pd.DataFrame(pd.read_csv("../feature/train_y_offline.csv"))

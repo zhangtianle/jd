@@ -2,7 +2,7 @@ from sys import path
 path.append('.')
 from tl.src.util import *
 from math import log
-
+import datetime as dt
 
 def get_loan_feature(MONTH, NUM, uid, loan):
 
@@ -15,6 +15,24 @@ def get_loan_feature(MONTH, NUM, uid, loan):
     loan["remain_pay"] = loan.loc[loan["month"] <= MONTH].apply(get_remain_pay, axis=1, args=(MONTH,))
     loan["remain_pay"] = loan["remain_pay"].fillna(0)
     # 汇总
+
+    # 分割
+    loan_split = loan.loc[loan["month"] <= MONTH]
+
+    # 到下个月的天数
+    loan_split['remain_days'] = loan_split['loan_time'].apply(lambda x: (dt.datetime(2016, MONTH + 1, 1) - parse(x)).days)
+    remain_days_mean = pd.DataFrame(loan_split.groupby('uid')['remain_days'].mean()).reset_index()
+    remain_days_max = pd.DataFrame(loan_split.groupby('uid')['remain_days'].max()).reset_index()
+    remain_days_min = pd.DataFrame(loan_split.groupby('uid')['remain_days'].min()).reset_index()
+
+    # amount_sum = pd.DataFrame(loan_split.groupby('uid')['loan_amount'].sum()).reset_index()
+    # remain_days_sum = loan_split.groupby('uid')['remain_days'].sum()
+    # loan_split['remain_per_day'] = remain_days_sum / amount_sum
+
+    # 计划时间是否超出时间
+    loan_split['over'] = loan_split.apply(lambda x: 1 if x['month'] + x['plannum'] <= MONTH else 0, axis=1)
+    over_rate = pd.DataFrame(loan_split.groupby('uid')['over'].sum() / loan_split.groupby('uid').size()).reset_index()
+
 
     # 平均每月贷款
     average_loan = pd.DataFrame({"average_loan": loan.loc[loan["month"] <= MONTH]["loan_amount"].groupby([loan["uid"]]).sum()}).reset_index()
@@ -83,6 +101,10 @@ def get_loan_feature(MONTH, NUM, uid, loan):
     # feature_loan = pd.merge(feature_loan, max_pay_each, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, average_loan_each, on=["uid"], how="left")
     # feature_loan = pd.merge(feature_loan, min_loan_each, on=["uid"], how="left")
-    # feature_loan = pd.merge(feature_loan, max_loan_each, on=["uid"], how="left")
+    feature_loan = pd.merge(feature_loan, remain_days_mean, on=["uid"], how="left")
+    feature_loan = pd.merge(feature_loan, remain_days_max, on=["uid"], how="left")
+    feature_loan = pd.merge(feature_loan, remain_days_min, on=["uid"], how="left")
+    feature_loan = pd.merge(feature_loan, over_rate, on=["uid"], how="left")
+    # feature_loan = pd.merge(feature_loan, amount_sum, on=["uid"], how="left")
 
     return feature_loan

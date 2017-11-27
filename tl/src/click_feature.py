@@ -1,4 +1,5 @@
 from sys import path
+
 path.append('.')
 import pandas as pd
 
@@ -17,6 +18,7 @@ def get_click_feature(MONTH, click):
     click_feature = pd.get_dummies(click, columns=['pid', 'param'])
     # 各网页点击次数
     click_feature = click_feature.groupby('uid').sum().reset_index()
+    click_feature = click_feature.drop('month', axis=1)
 
     click_feature.to_csv('./../feature/click_feature_{}.csv'.format(MONTH), index=False)
     return click_feature
