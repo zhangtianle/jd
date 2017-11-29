@@ -77,7 +77,7 @@ def xgb_train(X, Y):
 
     train_X = data_scaler(train_X)
 
-    X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=8)
+    X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
 
     dtrain = xgb.DMatrix(X_train, label=y_train)
     dtest = xgb.DMatrix(X_test, label=y_test)
@@ -130,7 +130,7 @@ def xgb_train_online(X, Y, Test, uid):
     result = pd.DataFrame()
     result[0] = uid
     result[1] = predict
-    result.to_csv("../result/result_11.27_1_xbg.csv", header=None, index=False, encoding="utf-8")
+    result.to_csv("../result/result_11.28_1_xbg.csv", header=None, index=False, encoding="utf-8")
 
 
 def offline(X, Y):
@@ -144,7 +144,7 @@ def offline(X, Y):
     clf = GradientBoostingRegressor(loss='ls', alpha=0.9,
                                     n_estimators=500,
                                     learning_rate=0.05,
-                                    max_depth=10,
+                                    max_depth=8,
                                     subsample=0.8,
                                     min_samples_split=9,
                                     max_leaf_nodes=10)
@@ -208,9 +208,9 @@ def online_GBDT(X, Y, Test, uid):
 
     clf = GradientBoostingRegressor(loss='ls', alpha=0.9,
                                     n_estimators=500,
-                                    learning_rate=.02,
+                                    learning_rate=.05,
                                     max_depth=8,
-                                    subsample=0.8, min_samples_leaf=9,
+                                    subsample=0.8,
                                     min_samples_split=9,
                                     max_leaf_nodes=10)
     clf.fit(train_X, train_Y)
@@ -221,7 +221,7 @@ def online_GBDT(X, Y, Test, uid):
     result = pd.DataFrame()
     result[0] = uid
     result[1] = predict
-    result.to_csv("../result/result_11.21_GBDT.csv", header=None, index=False, encoding="utf-8")
+    result.to_csv("../result/result_11.28_GBDT.csv", header=None, index=False, encoding="utf-8")
 
 
 def data_scaler(data):
@@ -252,9 +252,9 @@ def main():
     # classify = xgb_classify(X, Y)
 
     # offline(X, Y)
-    preds = xgb_train(X, Y)
+    # preds = xgb_train(X, Y)
     # xgb_train_online(X, Y, Test, uid)
-    # online_GBDT(X, Y, Test, uid)
+    online_GBDT(X, Y, Test, uid)
     # online_LR(X, Y, Test, uid)
 
 

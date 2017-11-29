@@ -10,11 +10,11 @@ from tl.src.util import read_data
 
 class MyModel:
     def __init__(self):
-        self.xgb_r_param = {'max_depth': 6, 'eta': 0.05, 'silent': 1, 'eval_metric': 'rmse', 'max_leaf_nodes': 8}
+        self.xgb_r_param = {'max_depth': 5, 'eta': 0.05, 'silent': 1, 'eval_metric': 'rmse', 'max_leaf_nodes': 4}
         self.xgb_c_param = {'objective': 'binary:logistic', 'max_depth': 6, 'eta': 0.05, 'silent': 1,
                             'eval_metric': 'error', 'max_leaf_nodes': 10}
 
-        self.xgb_r_num_round = 200
+        self.xgb_r_num_round = 140
         self.xgb_c_num_round = 80
 
         self.param_grid = ParameterGrid({'max_depth': [6, 7, 8, 9, 10, 11, 12],
