@@ -7,9 +7,9 @@ from tl.src.user_feature import get_user_feature
 from tl.src.util import get_url, read_data, split_by_month
 
 
-def get_click_feature(MONTH, click):
+def get_click_feature(start_month, MONTH, click):
     click["month"] = click["click_time"].apply(split_by_month)
-    click = click.loc[click["month"] <= MONTH]
+    click = click[(click["month"] >= start_month) & click["month"] <= MONTH]
 
     # click.drop(['month', 'click_time'], axis=1, inplace=True)
     click.drop(['click_time'], axis=1, inplace=True)
@@ -20,13 +20,14 @@ def get_click_feature(MONTH, click):
     click_feature = click_feature.groupby('uid').sum().reset_index()
     click_feature = click_feature.drop('month', axis=1)
 
-    click_feature.to_csv('./../feature/click_feature_{}.csv'.format(MONTH), index=False)
+    click_feature.to_csv('./../feature/click_feature_start_{0}_end_{1}.csv'.format(start_month, MONTH), index=False)
     return click_feature
 
 
 if __name__ == "__main__":
     root_dir, train_url, feature_url = get_url()
     loan, user, order, click = read_data()
-    click = get_click_feature(10, click)
-    user_m = get_user_feature(10, user, feature_url, save=0)
-    feature = pd.merge(user_m, click, on=["uid"], how="left")
+    # click = get_click_feature(10, click)
+    click = get_click_feature(8, 10, click)
+    # user_m = get_user_feature(10, user, feature_url, save=0)
+    # feature = pd.merge(user_m, click, on=["uid"], how="left")

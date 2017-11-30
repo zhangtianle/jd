@@ -6,9 +6,10 @@ from dateutil.parser import parse
 from tl.src.util import change_loan, get_url, read_data
 
 
-def get_user_feature(MONTH, user, feature_url, save=0):
+def get_user_feature(start_month, MONTH, user, feature_url, save=0):
     # 计算激活日期与2016年x月1日的时间差
     user['delta_time'] = user.apply(lambda x: (dt.datetime(2016, MONTH + 1, 1) - parse(x['active_date'])).days, axis=1)
+    user['start_delta_time'] = user.apply(lambda x: (parse(x['active_date']) - dt.datetime(2016, start_month, 1)).days, axis=1)
 
     # 转换金钱
     user['limit'] = change_loan(user['limit'])

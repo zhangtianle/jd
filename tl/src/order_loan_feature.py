@@ -3,7 +3,9 @@ import pandas as pd
 from math import log
 
 
-def get_order_loan(order, loan, MONTH, NUM):
+def get_order_loan(order, loan, start_month, MONTH, NUM):
+
+    # TODO
     order["real_price"] = order.apply(count_price_per_order, axis=1)
     current_price_sum = pd.DataFrame({"current_price_sum": order.loc[order["month"] == MONTH]["real_price"].groupby(
         [order["uid"]]).sum()}).reset_index()
@@ -19,5 +21,4 @@ def get_order_loan(order, loan, MONTH, NUM):
                                                       axis=1)
 
     loan_order = pd.DataFrame(loan_order[["uid", "loan_order_ratio"]])
-    print(loan_order.head())
     return loan_order

@@ -20,32 +20,27 @@ order['discount'] = change_loan(order['discount'])
 
 uid = pd.DataFrame(user["uid"])
 
-MONTH = 10
-NUM = 3.0
 
-feature_loan = get_loan_feature(MONTH, NUM, uid, loan)
-user_m = get_user_feature(MONTH, user, feature_url, save=0)
-feature = get_order_feature(MONTH, NUM, order, uid)
-order_loan = get_order_loan(order, loan, MONTH, NUM)
-# feature_click = get_click_feature(MONTH, click)
-feature_click = pd.DataFrame(pd.read_csv('D:/project/python/jd/tl/feature/click_feature_10.csv'))
+for start_month in [8, 9]:
+    MONTH = start_month + 2
+    NUM = 3
 
-feature = pd.merge(feature, feature_loan, on=["uid"], how="left")
-feature = pd.merge(feature, user_m, on=["uid"], how="left")
-feature = pd.merge(feature, feature_click, on=["uid"], how="left")
-feature = pd.merge(feature, order_loan, on=["uid"], how="left")
+    feature_loan = get_loan_feature(start_month, MONTH, NUM, uid, loan)
+    user_m = get_user_feature(start_month, MONTH, user, feature_url, save=0)
+    feature = get_order_feature(start_month, MONTH, NUM, order, uid)
+    order_loan = get_order_loan(order, loan, start_month, MONTH, NUM)
+    feature_click = get_click_feature(start_month, MONTH, click)
 
-# 处理异常值
-feature = handle_na(feature)
+    # feature_click = pd.DataFrame(pd.read_csv('D:/project/python/jd/tl/feature/click_feature_end_' + MONTH + '.csv'))
 
-# 保存特征数据
-feature.to_csv(feature_url + "train_x_offline.csv", index=False)
+    feature = pd.merge(feature, feature_loan, on=["uid"], how="left")
+    feature = pd.merge(feature, user_m, on=["uid"], how="left")
+    feature = pd.merge(feature, feature_click, on=["uid"], how="left")
+    feature = pd.merge(feature, order_loan, on=["uid"], how="left")
 
-# 获得预测值
-loan_next_month = pd.DataFrame(pd.read_csv(root_dir + "t_loan_sum.csv"))
-loan_next_month.pop("month")
+    # 处理异常值
+    feature = handle_na(feature)
 
-loan_next_month = pd.merge(uid, loan_next_month, on=["uid"], how="left")
-loan_next_month["loan_sum"] = loan_next_month["loan_sum"].fillna(0.0)
-# 保存预测数据
-loan_next_month.to_csv(feature_url + "train_y_offline.csv", index=False)
+    # 保存特征数据
+    feature.to_csv(feature_url + "train_x_offline_start_" + start_month + "_end_" + MONTH + ".csv", index=False)
+
