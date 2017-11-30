@@ -25,6 +25,12 @@ def get_loan_feature(MONTH, NUM, uid, loan):
     remain_days_max = pd.DataFrame(loan_split.groupby('uid')['remain_days'].max()).reset_index()
     remain_days_min = pd.DataFrame(loan_split.groupby('uid')['remain_days'].min()).reset_index()
 
+    # 8月的天数过去的天数
+    loan_split['pass_days'] = loan_split['loan_time'].apply(lambda x: (parse(x) - dt.datetime(2016, 8, 1)).days)
+    pass_days_mean = pd.DataFrame(loan_split.groupby('uid')['pass_days'].mean()).reset_index()
+    pass_days_max = pd.DataFrame(loan_split.groupby('uid')['pass_days'].max()).reset_index()
+    pass_days_min = pd.DataFrame(loan_split.groupby('uid')['pass_days'].min()).reset_index()
+
     # 计划时间是否超出时间
     loan_split['over'] = loan_split.apply(lambda x: 1 if x['month'] + x['plannum'] <= MONTH else 0, axis=1)
     over_rate = pd.DataFrame(loan_split.groupby('uid')['over'].sum() / loan_split.groupby('uid').size()).reset_index()
@@ -135,6 +141,9 @@ def get_loan_feature(MONTH, NUM, uid, loan):
     feature_loan = pd.merge(feature_loan, remain_days_mean, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, remain_days_max, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, remain_days_min, on=["uid"], how="left")
+    feature_loan = pd.merge(feature_loan, pass_days_mean, on=["uid"], how="left")
+    feature_loan = pd.merge(feature_loan, pass_days_max, on=["uid"], how="left")
+    feature_loan = pd.merge(feature_loan, pass_days_min, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, over_rate, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, average_plannum, on=["uid"], how="left")
     feature_loan = pd.merge(feature_loan, next_month_remain_loan, on=["uid"], how="left")

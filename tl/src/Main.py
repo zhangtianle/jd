@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import xgboost as xgb
 
 from tl.src.MyModel import MyModel
-from tl.src.util import read_data
 
 
 def delete(x, test, coloumn):
@@ -130,7 +129,7 @@ def xgb_train_online(X, Y, Test, uid):
     result = pd.DataFrame()
     result[0] = uid
     result[1] = predict
-    result.to_csv("../result/result_11.28_1_xbg.csv", header=None, index=False, encoding="utf-8")
+    result.to_csv("../result/result_11.29_1_xbg.csv", header=None, index=False, encoding="utf-8")
 
 
 def offline(X, Y):
@@ -221,7 +220,7 @@ def online_GBDT(X, Y, Test, uid):
     result = pd.DataFrame()
     result[0] = uid
     result[1] = predict
-    result.to_csv("../result/result_11.28_GBDT.csv", header=None, index=False, encoding="utf-8")
+    result.to_csv("../result/result_11.29_2_GBDT.csv", header=None, index=False, encoding="utf-8")
 
 
 def data_scaler(data):
@@ -230,8 +229,6 @@ def data_scaler(data):
 
 
 def main():
-    # loan, user, order, click = read_data()
-    # uid = pd.DataFrame(user["uid"])
 
     X = pd.DataFrame(pd.read_csv("../feature/train_x_offline.csv"))
     Y = pd.DataFrame(pd.read_csv("../feature/train_y_offline.csv"))

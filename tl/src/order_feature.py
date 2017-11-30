@@ -15,6 +15,17 @@ def get_order_feature(MONTH, NUM, order, uid):
     # 用户买的单价
     order["per_price"] = order.apply(per_price, axis=1)
 
+    # 获取每个用户每次消费的平均/最低/最高的价格
+    average_price_each = order.loc[order["month"] <= MONTH].groupby(["uid"]).agg({"real_price": "mean"}).rename(
+        columns={"real_price": "average_price_each"}).reset_index()
+    average_price_each["average_price_each"] = average_price_each["average_price_each"].apply(lambda x: log(x + 1, 5))
+    min_price_each = pd.DataFrame({"min_price_each": order.loc[order["month"] <= MONTH]["real_price"].groupby(
+        [order["uid"]]).min()}).reset_index()
+    min_price_each["min_price_each"] = min_price_each["min_price_each"].apply(lambda x: log(x + 1, 5))
+    max_price_each = pd.DataFrame({"max_price_each": order.loc[order["month"] <= MONTH]["real_price"].groupby(
+        [order["uid"]]).max()}).reset_index()
+    max_price_each["max_price_each"] = max_price_each["max_price_each"].apply(lambda x: log(x + 1, 5))
+
     # 获取每个用户购物平均价格和平均折扣
     average_price = pd.DataFrame(
         {"average_price": order.loc[order["month"] <= MONTH]["real_price"].groupby([order["uid"]]).sum()}).reset_index()
@@ -33,5 +44,8 @@ def get_order_feature(MONTH, NUM, order, uid):
     feature = pd.merge(uid, current_price_sum, on=["uid"], how="left")
     feature = pd.merge(feature, average_price, on=["uid"], how="left")
     feature = pd.merge(feature, average_discount, on=["uid"], how="left")
+    feature = pd.merge(feature, average_price_each, on=["uid"], how="left")
+    feature = pd.merge(feature, min_price_each, on=["uid"], how="left")
+    feature = pd.merge(feature, max_price_each, on=["uid"], how="left")
 
     return feature
