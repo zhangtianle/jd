@@ -1,6 +1,5 @@
 from sys import path
-
-path.append('.')
+path.append('../../')
 from tl.src.util import split_by_month, count_price_per_order, per_price
 import pandas as pd
 from math import log

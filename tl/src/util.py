@@ -1,5 +1,5 @@
 from sys import path
-path.append('.')
+path.append('../../')
 from dateutil.parser import parse
 import numpy as np
 import configparser

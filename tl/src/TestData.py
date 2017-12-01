@@ -1,8 +1,7 @@
 from sys import path
+path.append('../../')
 
 from tl.src.order_loan_feature import get_order_loan
-
-path.append('.')
 from tl.src.click_feature import get_click_feature
 from tl.src.loan_feature import get_loan_feature
 from tl.src.order_feature import get_order_feature

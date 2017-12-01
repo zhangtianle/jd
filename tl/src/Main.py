@@ -1,3 +1,5 @@
+from sys import path
+path.append('../../')
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn import preprocessing
@@ -18,7 +20,7 @@ def error(y_train, predict):
     for _ in range(len(predict)):
         if predict[_] < 0:
             predict[_] = 0.0
-    print("Mean squared train error: %.2f" % mean_squared_error(y_train, predict) ** 0.5)
+    print("Mean squared train error: %.6f" % mean_squared_error(y_train, predict) ** 0.5)
 
 
 def xgb_classify(X, Y):
@@ -220,7 +222,7 @@ def online_GBDT(X, Y, Test, uid):
     result = pd.DataFrame()
     result[0] = uid
     result[1] = predict
-    result.to_csv("../result/result_11.29_2_GBDT.csv", header=None, index=False, encoding="utf-8")
+    result.to_csv("../result/result_12.01_1_GBDT.csv", header=None, index=False, encoding="utf-8")
 
 
 def data_scaler(data):
@@ -230,10 +232,15 @@ def data_scaler(data):
 
 def main():
 
-    X = pd.DataFrame(pd.read_csv("../feature/train_x_offline.csv"))
-    Y = pd.DataFrame(pd.read_csv("../feature/train_y_offline.csv"))
+    # X = pd.DataFrame(pd.read_csv("../feature/train_x_offline.csv"))
+    # Y = pd.DataFrame(pd.read_csv("../feature/train_y_offline.csv"))
+    #
+    # Test = pd.DataFrame(pd.read_csv("../feature/test_x_online.csv"))
 
-    Test = pd.DataFrame(pd.read_csv("../feature/test_x_online.csv"))
+    X = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_10.csv"))
+    Y = pd.DataFrame(pd.read_csv("../feature/train_y_11_offline.csv"))
+
+    Test = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_9_end_11.csv"))
 
     X = X.fillna(0)
     Test = Test.fillna(0)
@@ -249,9 +256,9 @@ def main():
     # classify = xgb_classify(X, Y)
 
     # offline(X, Y)
-    # preds = xgb_train(X, Y)
+    preds = xgb_train(X, Y)
     # xgb_train_online(X, Y, Test, uid)
-    online_GBDT(X, Y, Test, uid)
+    # online_GBDT(X, Y, Test, uid)
     # online_LR(X, Y, Test, uid)
 
 

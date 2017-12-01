@@ -1,3 +1,5 @@
+from sys import path
+path.append('../../')
 from tl.src.util import get_url, read_data, split_by_month, change_loan
 from math import log
 import pandas as pd

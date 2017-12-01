@@ -1,6 +1,5 @@
 from sys import path
-
-path.append('.')
+path.append('../../')
 from tl.src.util import split_by_month, get_pay_per_month, get_remain_loan, get_remain_pay
 from dateutil.parser import parse
 from math import log

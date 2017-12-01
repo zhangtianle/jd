@@ -1,3 +1,5 @@
+from sys import path
+path.append('../../')
 import numpy as np
 from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import GridSearchCV

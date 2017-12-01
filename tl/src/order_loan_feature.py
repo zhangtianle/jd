@@ -1,3 +1,5 @@
+from sys import path
+path.append('../../')
 from tl.src.util import count_price_per_order
 import pandas as pd
 from math import log
