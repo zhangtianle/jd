@@ -138,7 +138,7 @@ def offline(X, Y):
     train_X = X.as_matrix()
     train_Y = Y.as_matrix()
 
-    train_X = data_scaler(train_X)
+    # train_X = data_scaler(train_X)
 
     X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
 
@@ -204,8 +204,8 @@ def online_GBDT(X, Y, Test, uid):
     train_Y = Y.as_matrix()
     test_X = Test.as_matrix()
 
-    train_X = data_scaler(train_X)
-    test_X = data_scaler(test_X)
+    # train_X = data_scaler(train_X)
+    # test_X = data_scaler(test_X)
 
     clf = GradientBoostingRegressor(loss='ls', alpha=0.9,
                                     n_estimators=500,
@@ -222,7 +222,7 @@ def online_GBDT(X, Y, Test, uid):
     result = pd.DataFrame()
     result[0] = uid
     result[1] = predict
-    result.to_csv("../result/result_12.01_1_GBDT.csv", header=None, index=False, encoding="utf-8")
+    result.to_csv("../result/result_12.04_1_GBDT.csv", header=None, index=False, encoding="utf-8")
 
 
 def data_scaler(data):
@@ -256,9 +256,9 @@ def main():
     # classify = xgb_classify(X, Y)
 
     # offline(X, Y)
-    preds = xgb_train(X, Y)
+    # preds = xgb_train(X, Y)
     # xgb_train_online(X, Y, Test, uid)
-    # online_GBDT(X, Y, Test, uid)
+    online_GBDT(X, Y, Test, uid)
     # online_LR(X, Y, Test, uid)
 
 

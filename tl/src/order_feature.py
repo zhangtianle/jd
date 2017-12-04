@@ -9,7 +9,7 @@ def get_order_feature(start_month, MONTH, NUM, order, uid):
     # 为消费记录，按照时间分割
     order["month"] = order["buy_time"].apply(split_by_month)
     # 分割
-    order = order[(order["month"] >= start_month) & (order["month"] <= MONTH)]
+    order = order.loc[(order["month"] >= start_month) & (order["month"] <= MONTH)]
     # 提取购物特征
     order["price"] = order["price"].fillna(0)
     # 获取用户在每笔费用的实际消费（金钱*数量-折扣）

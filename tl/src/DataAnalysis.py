@@ -1,5 +1,6 @@
 from sys import path
 path.append('../../')
+from tl.src.user_loan_feature import get_user_loan_feature
 from tl.src.order_loan_feature import get_order_loan
 from tl.src.click_feature import get_click_feature
 from tl.src.loan_feature import get_loan_feature
@@ -25,6 +26,7 @@ for start_month in [9]:
     user_m = get_user_feature(start_month, MONTH, user, feature_url, save=0)
     feature = get_order_feature(start_month, MONTH, NUM, order, uid)
     order_loan = get_order_loan(order, loan, start_month, MONTH, NUM)
+    user_loan = get_user_loan_feature(user, loan, start_month, MONTH)
     # feature_click = get_click_feature(start_month, MONTH, click)
 
     feature_click = pd.DataFrame(
@@ -34,6 +36,7 @@ for start_month in [9]:
     feature = pd.merge(feature, user_m, on=["uid"], how="left")
     feature = pd.merge(feature, feature_click, on=["uid"], how="left")
     feature = pd.merge(feature, order_loan, on=["uid"], how="left")
+    feature = pd.merge(feature, user_loan, on=["uid"], how="left")
 
     # 处理异常值
     feature = handle_na(feature)
