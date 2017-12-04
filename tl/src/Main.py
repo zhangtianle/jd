@@ -19,7 +19,7 @@ def error(y_train, predict):
     for _ in range(len(predict)):
         if predict[_] < 0:
             predict[_] = 0.0
-    print("Mean squared train error: %.2f" % mean_squared_error(y_train, predict) ** 0.5)
+    print("Mean squared train error: %.7f" % mean_squared_error(y_train, predict) ** 0.5)
 
 
 def xgb_classify(X, Y):
@@ -221,7 +221,7 @@ def online_GBDT(X, Y, Test, uid):
     result = pd.DataFrame()
     result[0] = uid
     result[1] = predict
-    result.to_csv("../result/result_11.28_GBDT.csv", header=None, index=False, encoding="utf-8")
+    result.to_csv("../result/result_12.04_2_GBDT.csv", header=None, index=False, encoding="utf-8")
 
 
 def data_scaler(data):
