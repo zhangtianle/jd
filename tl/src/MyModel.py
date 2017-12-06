@@ -39,10 +39,10 @@ if __name__ == '__main__':
     loan, user, order, click = read_data()
     uid = pd.DataFrame(user["uid"])
 
-    X = pd.DataFrame(pd.read_csv("../feature/train_x_offline.csv"))
-    Y = pd.DataFrame(pd.read_csv("../feature/train_y_offline.csv"))
+    X = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_10.csv"))
+    Y = pd.DataFrame(pd.read_csv("../feature/train_y_11_offline.csv"))
 
-    Test = pd.DataFrame(pd.read_csv("../feature/test_x_online.csv"))
+    Test = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_11.csv"))
 
     X = X.fillna(0)
     Test = Test.fillna(0)
@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
 
-    tpot = TPOTRegressor(generations=1, population_size=3, verbosity=2)
+    tpot = TPOTRegressor(generations=10, population_size=20, verbosity=2)
     tpot.fit(X_train, y_train)
     print(tpot.score(X_test, y_test))
     tpot.export('tpot_boston_pipeline.py')
