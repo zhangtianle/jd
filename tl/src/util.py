@@ -1,5 +1,6 @@
 from sys import path
 path.append('../../')
+from sklearn.metrics import mean_squared_error
 from dateutil.parser import parse
 import numpy as np
 import configparser
@@ -60,7 +61,7 @@ def get_url():
 
 
 def read_data():
-    root_dir, train_url, feature_url = get_url();
+    root_dir, train_url, feature_url = get_url()
     # read data
     loan = pd.DataFrame(pd.read_csv(root_dir + 't_loan.csv'))
     user = pd.DataFrame(pd.read_csv(root_dir + 't_user.csv'))
@@ -68,3 +69,14 @@ def read_data():
     click = pd.DataFrame(pd.read_csv(root_dir + 't_click.csv'))
 
     return loan, user, order, click
+
+
+def delete(x, test, coloumn):
+    return x.pop(coloumn), test.pop(coloumn)
+
+
+def error(y_train, predict):
+    for _ in range(len(predict)):
+        if predict[_] < 0:
+            predict[_] = 0.0
+    print("Mean squared train error: %.6f" % mean_squared_error(y_train, predict) ** 0.5)

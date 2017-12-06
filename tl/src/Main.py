@@ -1,5 +1,6 @@
 from sys import path
 path.append('../../')
+from tl.src.util import error, delete
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn import preprocessing
@@ -12,15 +13,6 @@ import xgboost as xgb
 from tl.src.MyModel import MyModel
 
 
-def delete(x, test, coloumn):
-    return x.pop(coloumn), test.pop(coloumn)
-
-
-def error(y_train, predict):
-    for _ in range(len(predict)):
-        if predict[_] < 0:
-            predict[_] = 0.0
-    print("Mean squared train error: %.6f" % mean_squared_error(y_train, predict) ** 0.5)
 
 
 def xgb_classify(X, Y):
@@ -222,7 +214,7 @@ def online_GBDT(X, Y, Test, uid):
     result = pd.DataFrame()
     result[0] = uid
     result[1] = predict
-    result.to_csv("../result/result_12.04_1_GBDT.csv", header=None, index=False, encoding="utf-8")
+    result.to_csv("../result/result_12.05_1_GBDT.csv", header=None, index=False, encoding="utf-8")
 
 
 def data_scaler(data):
@@ -256,9 +248,9 @@ def main():
     # classify = xgb_classify(X, Y)
 
     # offline(X, Y)
-    # preds = xgb_train(X, Y)
+    preds = xgb_train(X, Y)
     # xgb_train_online(X, Y, Test, uid)
-    online_GBDT(X, Y, Test, uid)
+    # online_GBDT(X, Y, Test, uid)
     # online_LR(X, Y, Test, uid)
 
 

@@ -18,9 +18,9 @@ order['discount'] = change_loan(order['discount'])
 
 uid = pd.DataFrame(user["uid"])
 
-for start_month in [9]:
-    MONTH = start_month + 2
-    NUM = 3
+for start_month in [8]:
+    MONTH = start_month + 3
+    NUM = 4
 
     feature_loan = get_loan_feature(start_month, MONTH, NUM, uid, loan)
     user_m = get_user_feature(start_month, MONTH, user, feature_url, save=0)
