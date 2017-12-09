@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
 
-    tpot = TPOTRegressor(generations=10, population_size=20, verbosity=2)
+    tpot = TPOTRegressor(generations=25, population_size=50, verbosity=2)
     tpot.fit(X_train, y_train)
     print(tpot.score(X_test, y_test))
     tpot.export('tpot_boston_pipeline.py')

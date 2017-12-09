@@ -1,19 +1,49 @@
 from sys import path
+
+from tpot.builtins import StackingEstimator
+
 path.append('../../')
 from tl.src.util import error, delete
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn import preprocessing
-from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import xgboost as xgb
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+from sklearn.linear_model import RidgeCV
+from sklearn.pipeline import make_pipeline
 
 from tl.src.MyModel import MyModel
 
 
+def ptot_result(X, Y, Test, uid):
+    train_X = X.as_matrix()
+    train_Y = Y.as_matrix()
 
+    test_X = Test.as_matrix()
+
+    exported_pipeline = make_pipeline(
+        StackingEstimator(estimator=RidgeCV()),
+        StackingEstimator(estimator=GradientBoostingRegressor(alpha=0.99, learning_rate=0.01, loss="huber", max_depth=6,
+                                                              max_features=0.45, min_samples_leaf=12,
+                                                              min_samples_split=18, n_estimators=100,
+                                                              subsample=0.7500000000000001)),
+        RandomForestRegressor(bootstrap=False, max_features=0.05, min_samples_leaf=11, min_samples_split=8,
+                              n_estimators=100)
+    )
+
+    exported_pipeline.fit(train_X, train_Y)
+    predict = exported_pipeline.predict(test_X)
+
+    for _ in range(len(predict)):
+        if predict[_] < 0:
+            predict[_] = 0.0
+    result = pd.DataFrame()
+    result[0] = uid
+    result[1] = predict
+    result.to_csv("../result/result_12.09_1_ptot.csv", header=None, index=False, encoding="utf-8")
 
 def xgb_classify(X, Y):
     train_X = X.as_matrix()
@@ -232,7 +262,7 @@ def main():
     X = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_10.csv"))
     Y = pd.DataFrame(pd.read_csv("../feature/train_y_11_offline.csv"))
 
-    Test = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_9_end_11.csv"))
+    Test = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_11.csv"))
 
     X = X.fillna(0)
     Test = Test.fillna(0)
@@ -248,10 +278,11 @@ def main():
     # classify = xgb_classify(X, Y)
 
     # offline(X, Y)
-    preds = xgb_train(X, Y)
+    # preds = xgb_train(X, Y)
     # xgb_train_online(X, Y, Test, uid)
     # online_GBDT(X, Y, Test, uid)
     # online_LR(X, Y, Test, uid)
+    ptot_result(X, Y, Test, uid)
 
 
 if __name__ == "__main__":
