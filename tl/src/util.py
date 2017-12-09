@@ -80,3 +80,13 @@ def error(y_train, predict):
         if predict[_] < 0:
             predict[_] = 0.0
     print("Mean squared train error: %.6f" % mean_squared_error(y_train, predict) ** 0.5)
+
+
+def save_to_file(predict, uid, text):
+    for _ in range(len(predict)):
+        if predict[_] < 0:
+            predict[_] = 0.0
+    result = pd.DataFrame()
+    result[0] = uid
+    result[1] = predict
+    result.to_csv(text, header=None, index=False, encoding="utf-8")

@@ -12,7 +12,7 @@ loan = loan.fillna(0)
 loan["month"] = loan["loan_time"].apply(split_by_month)
 
 # 分割
-loan = loan[loan["month"] == 10]
+loan = loan[loan["month"] == 11]
 
 loan['loan_amount'] = change_loan(loan['loan_amount'])
 loan_amount = pd.DataFrame({"loan_sum": loan.groupby(loan['uid'])['loan_amount'].sum()}).reset_index()
@@ -23,4 +23,4 @@ loan_amount.to_csv(feature_url + "loan_sum_11.csv")
 
 loan_next_month = pd.merge(pd.DataFrame(user['uid']), loan_amount, on=["uid"], how="left")
 loan_next_month["loan_sum"] = loan_next_month["loan_sum"].fillna(0.0)
-loan_next_month.to_csv(feature_url + "train_y_10_offline.csv", index=False)
+loan_next_month.to_csv(feature_url + "train_y_11_offline.csv", index=False)

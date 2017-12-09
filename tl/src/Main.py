@@ -1,9 +1,7 @@
 from sys import path
-
-from tpot.builtins import StackingEstimator
-
 path.append('../../')
-from tl.src.util import error, delete
+from tpot.builtins import StackingEstimator
+from tl.src.util import error, delete, save_to_file
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn import preprocessing
@@ -37,13 +35,7 @@ def ptot_result(X, Y, Test, uid):
     exported_pipeline.fit(train_X, train_Y)
     predict = exported_pipeline.predict(test_X)
 
-    for _ in range(len(predict)):
-        if predict[_] < 0:
-            predict[_] = 0.0
-    result = pd.DataFrame()
-    result[0] = uid
-    result[1] = predict
-    result.to_csv("../result/result_12.09_1_ptot.csv", header=None, index=False, encoding="utf-8")
+    save_to_file(predict, uid, "../result/result_12.09_1_ptot.csv")
 
 def xgb_classify(X, Y):
     train_X = X.as_matrix()
@@ -102,8 +94,9 @@ def xgb_train(X, Y):
 
     X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
 
-    dtrain = xgb.DMatrix(X_train, label=y_train)
-    dtest = xgb.DMatrix(X_test, label=y_test)
+    features = [x for x in X.columns]
+    dtrain = xgb.DMatrix(X_train, label=y_train, feature_names=features)
+    dtest = xgb.DMatrix(X_test, label=y_test, feature_names=features)
     evallist = [(dtest, 'eval'), (dtrain, 'train')]
 
     model = MyModel()
@@ -114,8 +107,9 @@ def xgb_train(X, Y):
 
     # make prediction
     preds = bst.predict(dtest)
+    error(y_test, preds)
     xgb.plot_importance(bst)
-    # xgb.plot_tree(bst, num_trees=2)
+    # xgb.plot_tree(bst)
     plt.show()
 
     # 加上分类的结果
@@ -147,13 +141,7 @@ def xgb_train_online(X, Y, Test, uid):
     # xgb.plot_importance(bst)
     # xgb.plot_tree(bst, num_trees=2)
 
-    for _ in range(len(predict)):
-        if predict[_] < 0:
-            predict[_] = 0.0
-    result = pd.DataFrame()
-    result[0] = uid
-    result[1] = predict
-    result.to_csv("../result/result_11.29_1_xbg.csv", header=None, index=False, encoding="utf-8")
+    save_to_file(predict, uid, "../result/result_12.09_1_xgb.csv")
 
 
 def offline(X, Y):
@@ -211,14 +199,7 @@ def online_LR(X, Y, Test, uid):
     clf = LinearRegression()
     clf.fit(train_X, train_Y)
     predict = clf.predict(test_X)
-    for _ in range(len(predict)):
-        if predict[_] < 0:
-            predict[_] = 0.0
-
-    result = pd.DataFrame()
-    result[0] = uid
-    result[1] = predict
-    result.to_csv("../result/result_11.20_LR.csv", header=None, index=False, encoding="utf-8")
+    save_to_file(predict, uid, "../result/result_12.09_1_lr.csv")
 
 
 def online_GBDT(X, Y, Test, uid):
@@ -238,13 +219,7 @@ def online_GBDT(X, Y, Test, uid):
                                     max_leaf_nodes=10)
     clf.fit(train_X, train_Y)
     predict = clf.predict(test_X)
-    for _ in range(len(predict)):
-        if predict[_] < 0:
-            predict[_] = 0.0
-    result = pd.DataFrame()
-    result[0] = uid
-    result[1] = predict
-    result.to_csv("../result/result_12.05_1_GBDT.csv", header=None, index=False, encoding="utf-8")
+    save_to_file(predict, uid, "../result/result_12.09_1_gbdt.csv")
 
 
 def data_scaler(data):
@@ -256,16 +231,15 @@ def main():
 
     # X = pd.DataFrame(pd.read_csv("../feature/train_x_offline.csv"))
     # Y = pd.DataFrame(pd.read_csv("../feature/train_y_offline.csv"))
-    #
     # Test = pd.DataFrame(pd.read_csv("../feature/test_x_online.csv"))
 
-    X = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_10.csv"))
+    X = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_10_bak.csv"))
     Y = pd.DataFrame(pd.read_csv("../feature/train_y_11_offline.csv"))
 
     Test = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_11.csv"))
 
-    X = X.fillna(0)
-    Test = Test.fillna(0)
+    # X = X.fillna(0)
+    # Test = Test.fillna(0)
 
     _, uid = delete(X, Test, "uid")
     # delete(X, Test, "average_discount")
@@ -278,11 +252,11 @@ def main():
     # classify = xgb_classify(X, Y)
 
     # offline(X, Y)
-    # preds = xgb_train(X, Y)
+    preds = xgb_train(X, Y)
     # xgb_train_online(X, Y, Test, uid)
     # online_GBDT(X, Y, Test, uid)
     # online_LR(X, Y, Test, uid)
-    ptot_result(X, Y, Test, uid)
+    # ptot_result(X, Y, Test, uid)
 
 
 if __name__ == "__main__":
