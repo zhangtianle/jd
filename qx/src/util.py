@@ -58,7 +58,7 @@ def get_order_feature(order, MONTH, NUM, uid):
 	
 	#统计所有人平均每次购物的平均价格和平均价格
     static_price_sum_mean = np.array(history["price_sum_discount"]).mean()
-    static_price_mean= np.array(history["price"]).mean()
+    static_price_mean = np.array(history["price"]).mean()
     #######
     tmp_price_sum_mean = history.groupby(["uid"]).agg({"price_sum_discount": "mean"}).rename(
         columns={"price_sum_discount": "price_sum_mean"}).reset_index()

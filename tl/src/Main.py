@@ -1,26 +1,130 @@
 from sys import path
+
+from sklearn.feature_selection import SelectFwe, f_regression
+
 path.append('../../')
+from sklearn.preprocessing import RobustScaler, MinMaxScaler
 from tpot.builtins import StackingEstimator
 from tl.src.util import error, delete, save_to_file
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, LassoLarsCV
 from sklearn import preprocessing
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import xgboost as xgb
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor, ExtraTreesRegressor
 from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 
 from tl.src.MyModel import MyModel
 
 
-def ptot_result(X, Y, Test, uid):
+def ptop_2030(X, Y, Test, uid, online=0):
     train_X = X.as_matrix()
     train_Y = Y.as_matrix()
 
     test_X = Test.as_matrix()
+
+    X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
+
+    # Score on the training set was:-3.207903288331976
+    exported_pipeline = make_pipeline(
+        SelectFwe(score_func=f_regression, alpha=0.038),
+        StackingEstimator(estimator=LassoLarsCV(normalize=False)),
+        StackingEstimator(
+            estimator=GradientBoostingRegressor(alpha=0.9, learning_rate=1.0, loss="quantile", max_depth=4,
+                                                max_features=0.8, min_samples_leaf=7, min_samples_split=17,
+                                                n_estimators=100, subsample=0.1)),
+        ExtraTreesRegressor(bootstrap=True, max_features=0.8500000000000001, min_samples_leaf=12, min_samples_split=10,
+                            n_estimators=100)
+    )
+
+    exported_pipeline.fit(X_train, y_train)
+    print("train:--------------")
+    predict = exported_pipeline.predict(X_train)
+    error(predict, y_train)
+
+    print("test:---------------")
+    predict = exported_pipeline.predict(X_test)
+    error(predict, y_test)
+
+    # online
+    if online == 1:
+        exported_pipeline.fit(train_X, train_Y)
+        predict = exported_pipeline.predict(test_X)
+        save_to_file(predict, uid, "../result/result_12.11_1_ptot2030.csv")
+
+
+def ptop_1050(X, Y, Test, uid, online=0):
+    train_X = X.as_matrix()
+    train_Y = Y.as_matrix()
+
+    test_X = Test.as_matrix()
+
+    # X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
+
+    # Score on the training set was:-3.196408119379142
+    exported_pipeline = make_pipeline(
+        MinMaxScaler(),
+        GradientBoostingRegressor(alpha=0.9, learning_rate=0.1, loss="ls", max_depth=5, max_features=0.2,
+                                  min_samples_leaf=3, min_samples_split=20, n_estimators=100,
+                                  subsample=0.9500000000000001)
+    )
+
+    # exported_pipeline.fit(X_train, y_train)
+    # print("train:--------------")
+    # predict = exported_pipeline.predict(X_train)
+    # error(predict, y_train)
+    #
+    # print("test:---------------")
+    # predict = exported_pipeline.predict(X_test)
+    # error(predict, y_test)
+
+    # online
+    if online == 1:
+        exported_pipeline.fit(train_X, train_Y)
+        predict = exported_pipeline.predict(test_X)
+        save_to_file(predict, uid, "../result/result_12.11_1_ptop_10503.csv")
+
+
+def ptop_2040(X, Y, Test, uid, online=0):
+    train_X = X.as_matrix()
+    train_Y = Y.as_matrix()
+
+    test_X = Test.as_matrix()
+
+    X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
+
+    exported_pipeline = make_pipeline(
+        StackingEstimator(estimator=LassoLarsCV(normalize=False)),
+        RobustScaler(),
+        GradientBoostingRegressor(alpha=0.8, learning_rate=0.1, loss="ls", max_depth=5, max_features=0.55,
+                                  min_samples_leaf=12, min_samples_split=14, n_estimators=100, subsample=0.5)
+    )
+
+    exported_pipeline.fit(X_train, y_train)
+    print("train:--------------")
+    predict = exported_pipeline.predict(X_train)
+    error(predict, y_train)
+
+    print("test:---------------")
+    predict = exported_pipeline.predict(X_test)
+    error(predict, y_test)
+
+    # online
+    if online == 1:
+        exported_pipeline.fit(train_X, train_Y)
+        predict = exported_pipeline.predict(test_X)
+        save_to_file(predict, uid, "../result/result_12.11_1_ptot.csv")
+
+def ptot_result(X, Y, Test, uid, online=0):
+    train_X = X.as_matrix()
+    train_Y = Y.as_matrix()
+
+    test_X = Test.as_matrix()
+
+    X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
 
     exported_pipeline = make_pipeline(
         StackingEstimator(estimator=RidgeCV()),
@@ -32,10 +136,21 @@ def ptot_result(X, Y, Test, uid):
                               n_estimators=100)
     )
 
-    exported_pipeline.fit(train_X, train_Y)
-    predict = exported_pipeline.predict(test_X)
+    exported_pipeline.fit(X_train, y_train)
+    print("train:--------------")
+    predict = exported_pipeline.predict(X_train)
+    error(predict, y_train)
 
-    save_to_file(predict, uid, "../result/result_12.09_1_ptot.csv")
+    print("test:---------------")
+    predict = exported_pipeline.predict(X_test)
+    error(predict, y_test)
+
+    # online
+    if online == 1:
+        exported_pipeline.fit(train_X, train_Y)
+        predict = exported_pipeline.predict(test_X)
+
+        save_to_file(predict, uid, "../result/result_12.11_0_ptot.csv")
 
 def xgb_classify(X, Y):
     train_X = X.as_matrix()
@@ -86,11 +201,9 @@ def xgb_classify_online(X, Y, Test, uid):
     return predict
 
 
-def xgb_train(X, Y):
+def xgb_train(X, Y, Test, uid, online=0):
     train_X = X.as_matrix()
     train_Y = Y.as_matrix()
-
-    train_X = data_scaler(train_X)
 
     X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=0.2, random_state=1)
 
@@ -112,6 +225,17 @@ def xgb_train(X, Y):
     # xgb.plot_tree(bst)
     plt.show()
 
+    if online == 1:
+        test_X = Test.as_matrix()
+
+        dtrain = xgb.DMatrix(train_X, label=train_Y)
+        dtest = xgb.DMatrix(test_X)
+        evallist = [(dtrain, 'train')]
+        bst = xgb.train(model.xgb_r_param, dtrain, model.xgb_r_num_round, evallist)
+        # make prediction
+        predict = bst.predict(dtest)
+        save_to_file(predict, uid, "../result/result_12.11_1_gbdt.csv")
+
     # 加上分类的结果
     # classify = xgb_classify(X, Y)
     # for i in range(len(preds)):
@@ -122,31 +246,11 @@ def xgb_train(X, Y):
     return preds
 
 
-def xgb_train_online(X, Y, Test, uid):
+def offline(X, Y, Test, uid, online=0):
     train_X = X.as_matrix()
     train_Y = Y.as_matrix()
 
     test_X = Test.as_matrix()
-
-    dtrain = xgb.DMatrix(train_X, label=train_Y)
-    dtest = xgb.DMatrix(test_X)
-    evallist = [(dtrain, 'train')]
-
-    model = MyModel()
-
-    bst = xgb.train(model.xgb_r_param, dtrain, model.xgb_r_num_round, evallist)
-    # make prediction
-    predict = bst.predict(dtest)
-
-    # xgb.plot_importance(bst)
-    # xgb.plot_tree(bst, num_trees=2)
-
-    save_to_file(predict, uid, "../result/result_12.09_1_xgb.csv")
-
-
-def offline(X, Y):
-    train_X = X.as_matrix()
-    train_Y = Y.as_matrix()
 
     # train_X = data_scaler(train_X)
 
@@ -157,6 +261,7 @@ def offline(X, Y):
                                     learning_rate=0.05,
                                     max_depth=8,
                                     subsample=0.8,
+                                    max_features=0.6,
                                     min_samples_split=9,
                                     max_leaf_nodes=10)
     clf = clf.fit(X_train, y_train)
@@ -174,52 +279,11 @@ def offline(X, Y):
     plt.ylabel('Feature Importance Score')
     plt.show()
 
-    clf = LinearRegression()
-    clf.fit(X_train, y_train)
-    predict = clf.predict(X_train)
-    print(clf.score(X_test, y_test))
-    for _ in range(len(predict)):
-        if predict[_] < 0:
-            predict[_] = 0.0
-    print("Linear Regression: Mean squared train error: %.2f" % mean_squared_error(y_train, predict))
-
-    predict = clf.predict(X_test)
-    print(clf.score(X_test, y_test))
-    for _ in range(len(predict)):
-        if predict[_] < 0:
-            predict[_] = 0.0
-    print("Linear Regression: Mean squared test error: %.2f" % mean_squared_error(y_test, predict))
-
-
-def online_LR(X, Y, Test, uid):
-    train_X = X.as_matrix()
-    train_Y = Y.as_matrix()
-    test_X = Test.as_matrix()
-
-    clf = LinearRegression()
-    clf.fit(train_X, train_Y)
-    predict = clf.predict(test_X)
-    save_to_file(predict, uid, "../result/result_12.09_1_lr.csv")
-
-
-def online_GBDT(X, Y, Test, uid):
-    train_X = X.as_matrix()
-    train_Y = Y.as_matrix()
-    test_X = Test.as_matrix()
-
-    # train_X = data_scaler(train_X)
-    # test_X = data_scaler(test_X)
-
-    clf = GradientBoostingRegressor(loss='ls', alpha=0.9,
-                                    n_estimators=500,
-                                    learning_rate=.05,
-                                    max_depth=8,
-                                    subsample=0.8,
-                                    min_samples_split=9,
-                                    max_leaf_nodes=10)
-    clf.fit(train_X, train_Y)
-    predict = clf.predict(test_X)
-    save_to_file(predict, uid, "../result/result_12.09_1_gbdt.csv")
+    # online
+    if online == 1:
+        clf.fit(train_X, train_Y)
+        predict = clf.predict(test_X)
+        save_to_file(predict, uid, "../result/result_12.11_old_gbdt.csv")
 
 
 def data_scaler(data):
@@ -233,7 +297,7 @@ def main():
     # Y = pd.DataFrame(pd.read_csv("../feature/train_y_offline.csv"))
     # Test = pd.DataFrame(pd.read_csv("../feature/test_x_online.csv"))
 
-    X = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_10_bak.csv"))
+    X = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_10.csv"))
     Y = pd.DataFrame(pd.read_csv("../feature/train_y_11_offline.csv"))
 
     Test = pd.DataFrame(pd.read_csv("../feature/train_x_offline_start_8_end_11.csv"))
@@ -251,12 +315,15 @@ def main():
 
     # classify = xgb_classify(X, Y)
 
-    # offline(X, Y)
-    preds = xgb_train(X, Y)
+    # offline(X, Y, Test, uid, online = 1)
+    # preds = xgb_train(X, Y, Test, uid)
     # xgb_train_online(X, Y, Test, uid)
     # online_GBDT(X, Y, Test, uid)
     # online_LR(X, Y, Test, uid)
-    # ptot_result(X, Y, Test, uid)
+    # ptot_result(X, Y, Test, uid, online=1)
+    # ptop_2040(X, Y, Test, uid)
+    # ptop_1050(X, Y, Test, uid, online=1)
+    ptop_2030(X, Y, Test, uid, online=1)
 
 
 if __name__ == "__main__":
