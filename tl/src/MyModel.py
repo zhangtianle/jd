@@ -1,12 +1,8 @@
 from sys import path
 
 path.append('../../')
-import numpy as np
 from tpot import TPOTRegressor
 from sklearn.model_selection import ParameterGrid
-from sklearn.model_selection import GridSearchCV
-import xgboost as xgb
-from xgboost import XGBRegressor
 import pandas as pd
 from sklearn.model_selection import train_test_split
 

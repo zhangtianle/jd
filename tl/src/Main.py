@@ -1,15 +1,12 @@
 from sys import path
-
-from sklearn.feature_selection import SelectFwe, f_regression
-
 path.append('../../')
+from sklearn.feature_selection import SelectFwe, f_regression
 from sklearn.preprocessing import RobustScaler, MinMaxScaler
 from tpot.builtins import StackingEstimator
 from tl.src.util import error, delete, save_to_file
 import pandas as pd
-from sklearn.linear_model import LinearRegression, LassoLarsCV
+from sklearn.linear_model import LassoLarsCV
 from sklearn import preprocessing
-from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import xgboost as xgb
