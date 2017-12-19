@@ -1,6 +1,17 @@
 # 2017京东金融信贷需求预测 赛题总结  
 [原文地址](https://tianle.me/2017/12/12/jd/)
 ## 比赛结果   
+---- 20171219更新 ----  
+> 浪教授  
+1. 以30天划分训练集，按30天为周期对齐；  
+2. 滑动窗口特征，等差 每 7 天 10 天 等；  
+3. 让预测月份的均值等于前几个月的均值（比赛前期）；   
+4. 强特征：激活日期、loan time、可贷款金额、 pid param组合前20个 one-hot    
+5. 模型融合，加权平均  
+
+> 第17名代码  
+https://github.com/klyan/JDD_Loan_Forecasting  
+
 A榜50，B榜48  
 ![A榜](https://img.tianle.me/image/20171212/a.png)
 ![B榜](https://img.tianle.me/image/20171212/b.png)
