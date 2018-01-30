@@ -3,7 +3,8 @@
 处理后特征用于训练  
 ### result(同名文件夹自己建立)  
 用于提交的结果文件  
-### src(同名文件夹自己建立)  
+### src  
+代码目录  
 Main.py 算法主脚本  
 
 DataAnalysis.py 各个特征处理文件（调用 xx_feature.py）  
