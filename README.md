@@ -20,7 +20,8 @@ A榜50，B榜48
 京东金融提供8到11月的用户借款信息，订单购买信息，页面点击信息以及用户个人和贷款的初始额度信息；要求预测12月每个用户的贷款信息。评价方式采用RMSE函数：  
 $$RMSE = \sqrt {\frac{1}{n}\sum\nolimits_{i = 1}^n {{{({y_i} - {{\hat y}_i})}^2}} } $$  
 其中yi真实值，y_hati为预测值，n为用户总数。  
-[数据下载,百度网盘](https://pan.baidu.com/s/1eSjeq9W)密码：2lk3  
+[赛题链接](https://jdder.jd.com/index/jddDetail?matchId=a6ada7b2aab34289bae565214bf19ede)
+[数据下载,百度网盘](https://pan.baidu.com/s/1b-USsanDScR0CRoHABfNGQ)密码：l94v  
 
 ## 解决方案  
 1. 数据分析
