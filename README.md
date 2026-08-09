@@ -1,3 +1,5 @@
+
+
 # 2017京东金融信贷需求预测 赛题总结  
 [原文地址](https://tianle.me/2017/12/12/jd/)
 ## 比赛结果   
@@ -42,7 +44,7 @@ $$RMSE = \sqrt {\frac{1}{n}\sum\nolimits_{i = 1}^n {{{({y_i} - {{\hat y}_i})}^2}
 
 * 方案一：  
 
-|0 |特征区间（feature）| 预测区间（llabel）|
+|0 |特征区间（feature）| 预测区间（label）|
 |---|---|---|
 |训练集|2016-08-03到2016-10-31|2016-11-01到2016-11-30|
 |测试集|2016-**08**-03到2016-11-30|2016-12-01到2016-12-31|
@@ -50,7 +52,7 @@ $$RMSE = \sqrt {\frac{1}{n}\sum\nolimits_{i = 1}^n {{{({y_i} - {{\hat y}_i})}^2}
 * 方案二：  
 将测试集中的8到11月改成9到11月，即  
 
-|0 |特征区间（feature）| 预测区间（llabel）|
+|0 |特征区间（feature）| 预测区间（label）|
 |---|---|---|
 |训练集|2016-08-03到2016-10-31|2016-11-01到2016-11-30|
 |测试集|2016-**09**-01到2016-11-30|2016-12-01到2016-12-31|  
@@ -189,4 +191,4 @@ stregr.predict(X_train)
 [第一次参加Kaggle拿银总结](http://scarletpan.github.io/summary-of-get-a-silver-medal-in-kaggle/)  
 [[天池竞赛系列]O2O优惠券使用预测复赛第三名思路](http://blog.csdn.net/bryan__/article/details/53907292)  
 [O2O第一名【诗人都藏在水底】代码 思路](https://github.com/wepe/O2O-Coupon-Usage-Forecast)  
-[O2O第十六名代码 思路](https://github.com/InsaneLife/O2O-Predict-Coupon-Usage)  
+[O2O第十六名代码 思路](https://github.com/InsaneLife/O2O-Predict-Coupon-Usage)
